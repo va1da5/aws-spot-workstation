@@ -1,0 +1,4 @@
+# ansible-galaxy install -r requirements.yml
+
+- src: geerlingguy.pip
+- src: geerlingguy.docker

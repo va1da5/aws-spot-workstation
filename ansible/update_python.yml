@@ -1,0 +1,35 @@
+---
+- hosts: all
+  tasks:
+    - name: Install dependencies
+      become: true
+      ansible.builtin.package:
+        name:
+          - amazon-linux-extras
+
+    - name: Enable amazon-linux-extras packages
+      become: true
+      shell: /usr/bin/amazon-linux-extras enable python3.8
+
+    - name: Install Python3.8
+      become: true
+      ansible.builtin.package:
+        name:
+          - python3.8
+          - python38-pip
+
+    - name: Install Python 3.8 and reset selection to auto
+      become: true
+      community.general.alternatives:
+        name: python3
+        path: /usr/bin/python3.8
+        link: /usr/bin/python3
+        state: auto
+
+    - name: Install PIP 3.8 and reset selection to auto
+      become: true
+      community.general.alternatives:
+        name: pip3
+        path: /usr/bin/pip3.8
+        link: /usr/bin/pip3
+        state: auto

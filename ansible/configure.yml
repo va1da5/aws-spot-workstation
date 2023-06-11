@@ -1,0 +1,42 @@
+---
+- hosts: all
+  tasks:
+    - name: Install dependencies
+      become: true
+      ansible.builtin.package:
+        name:
+          - git
+          - zsh
+          - htop
+          - tmux
+
+    - name: Set default git branch to main
+      ansible.builtin.shell: git config --global init.defaultBranch main
+      args:
+        creates: .gitconfig
+
+    - name: Install oh-my-zsh
+      ansible.builtin.shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+      args:
+        creates: .oh-my-zsh/tools/uninstall.sh
+
+    - name: Change user shell to zsh
+      become: yes
+      ansible.builtin.user:
+        name: "{{ ansible_user_id }}"
+        shell: /usr/bin/zsh
+
+    - name: Clone a repo with Tmux Plugin Manager
+      ansible.builtin.git:
+        repo: https://github.com/tmux-plugins/tpm
+        dest: ".tmux/plugins/tpm"
+
+    - name: Update tmux configuration
+      ansible.builtin.copy:
+        src: "{{playbook_dir}}/files/tmux.conf"
+        dest: ".tmux.conf"
+
+    - name: Add custom aliases
+      ansible.builtin.copy:
+        src: "{{playbook_dir}}/files/aliases.zsh"
+        dest: ".oh-my-zsh/custom/aliases.zsh"
